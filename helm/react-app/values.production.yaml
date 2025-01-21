@@ -1,0 +1,11 @@
+environment:
+  name: production
+  config:
+    domain: app.example.com
+    resources:
+      limits:
+        cpu: 200m
+        memory: 256Mi
+    features:
+      debugMode: false
+      errorReporting: true

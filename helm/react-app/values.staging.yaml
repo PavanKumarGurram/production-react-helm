@@ -1,0 +1,11 @@
+environment:
+  name: staging
+  config:
+    domain: staging.example.com
+    resources:
+      limits:
+        cpu: 150m
+        memory: 192Mi
+    features:
+      debugMode: false
+      errorReporting: true

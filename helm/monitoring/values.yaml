@@ -1,0 +1,21 @@
+kube-prometheus-stack:
+  grafana:
+    enabled: true
+    adminPassword: admin
+    dashboardProviders:
+      dashboardproviders.yaml:
+        apiVersion: 1
+        providers:
+        - name: 'react-app'
+          orgId: 1
+          folder: 'React App'
+          type: file
+          disableDeletion: false
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/react-app
+
+  prometheus:
+    prometheusSpec:
+      serviceMonitorSelectorNilUsesHelmValues: false
+      podMonitorSelectorNilUsesHelmValues: false

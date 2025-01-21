@@ -1,0 +1,23 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: frontend-slos
+  namespace: monitoring
+spec:
+  groups:
+  - name: frontend-slos
+    rules:
+    - record: frontend:availability:ratio
+      expr: sum(rate(http_requests_total{status!~"5.."}[30d])) / sum(rate(http_requests_total[30d]))
+
+    - record: frontend:latency:p95
+      expr: histogram_quantile(0.95, sum(rate(page_load_time_bucket[30d])) by (le))
+
+    - alert: SLOAvailabilityBudgetBurn
+      expr: frontend:availability:ratio < 0.999
+      for: 1h
+      labels:
+        severity: critical
+      annotations:
+        summary: "Availability SLO budget burn"
+        description: "Service availability is below 99.9%"

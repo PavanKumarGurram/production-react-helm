@@ -1,0 +1,15 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: {{ .Release.Name }}-instrumentation
+  namespace: {{ .Release.Namespace }}
+spec:
+  exporter:
+    endpoint: http://{{ .Release.Name }}-jaeger-collector:4317
+  propagators:
+    - tracecontext
+    - baggage
+    - b3
+  sampler:
+    type: parentbased_traceidratio
+    argument: "1"

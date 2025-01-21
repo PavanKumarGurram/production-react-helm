@@ -1,0 +1,113 @@
+# Default values for react-app
+replicaCount: 3
+
+# Environment-specific configurations
+environment:
+  name: production # Can be development, staging, or production
+  config:
+    development:
+      domain: dev.example.com
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+    staging:
+      domain: staging.example.com
+      resources:
+        limits:
+          cpu: 150m
+          memory: 192Mi
+    production:
+      domain: app.example.com
+      resources:
+        limits:
+          cpu: 200m
+          memory: 256Mi
+
+# Image configuration
+image:
+  # Docker image repository
+  repository: ${DOCKER_REGISTRY}/react-app
+  # Image tag (set by CI/CD)
+  tag: latest
+  # Image pull policy
+  pullPolicy: Always
+
+# Ingress configuration
+ingress:
+  # Enable ingress resource
+  enabled: true
+  # Ingress class name (e.g., nginx)
+  className: nginx
+  # Domain name
+  host: "${environment.config.${environment.name}.domain}"
+  # TLS configuration
+  tls:
+    enabled: true
+    secretName: react-app-tls
+
+# Resource limits and requests
+resources:
+  limits:
+    cpu: "${environment.config.${environment.name}.resources.limits.cpu}"
+    memory: "${environment.config.${environment.name}.resources.limits.memory}"
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# CDN configuration for production
+cdn:
+  # Enable CDN
+  enabled: true
+  # CDN provider (cloudflare)
+  provider: cloudflare
+  # Cache rules for static assets
+  cacheRules:
+    - "*.js:max-age=31536000,immutable"
+    - "*.css:max-age=31536000,immutable"
+    - "*.png:max-age=31536000,immutable"
+    - "*.jpg:max-age=31536000,immutable"
+    - "*.svg:max-age=31536000,immutable"
+    - "/:no-cache"
+
+# Monitoring configuration
+monitoring:
+  # Enable service monitor
+  enabled: true
+  # Metrics path
+  path: /metrics
+  # Scrape interval
+  interval: 15s
+
+# Security configuration
+security:
+  # Pod security context
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 101
+    runAsGroup: 101
+    fsGroup: 101
+  
+  # Container security context
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 101
+
+# Network policies
+networkPolicy:
+  enabled: true
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system

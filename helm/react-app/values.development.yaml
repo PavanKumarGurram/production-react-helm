@@ -1,0 +1,11 @@
+environment:
+  name: development
+  config:
+    domain: dev.example.com
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+    features:
+      debugMode: true
+      errorReporting: true
